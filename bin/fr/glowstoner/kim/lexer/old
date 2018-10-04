@@ -1,0 +1,210 @@
+public void showResults() {
+		System.out.println(" -- BUILD LEXER BLOCK RESULT (full block tree) : ");
+		
+		System.out.println("main block (fullblock) level 1");
+		
+		deepSearchResults(0, this.fullBlock);
+		
+		System.out.println("END");
+	}
+	
+	private void detectBlocks() {
+		System.out.println(" -------- DETECTION BLOCKS -------- ");
+		
+		for(int i = 0 ; i < lines.size() ; i++) {
+			String line = lines.get(i);
+			
+			System.out.println("Potential search line = "+line+" with i = "+i+" ...");
+			
+			if(this.isBlock(line)) {
+				int fb = this.getFullBlock(i);
+				
+				if(fb == -1) {
+					throw new Error("Erreur lexer -> detectBlocks (full block)");
+				}
+				
+				TokenBlock tb = new TokenBlock(this.getBlockLines(i, fb), i, fb);
+				
+				Map<Integer, List<String>> subbs = this.getSubBlocks(i, fb);
+				System.out.println(subbs);
+				for(int subline : subbs.keySet()) {
+					List<String> value = subbs.get(subline);
+					System.out.println(value.toString());
+					tb.addSubBlock(new TokenBlock(value, subline, (subline + value.size())));
+				}
+				
+				System.out.println("search end, put in fullBlocks map ... (fb="+fb+")");
+				
+				this.fullBlock.addSubBlock(tb);
+				
+				i = fb;
+			}
+		}
+		
+		System.out.println(" -------- DETECTION BLOCKS END -------- ");
+	}
+	
+	private Map<Integer, List<String>> getSubBlocks(int start, int end) {
+		System.out.println(" -------- DETECTION SUBBLOCKS -------- ");
+		
+		Map<Integer, List<String>> map = new HashMap<>();
+		
+		System.out.println("recherche subblocks with start: "+start+", end: "+end+" ...");
+		
+		boolean nextBody = false;
+		
+		for(int i = start ; i < end ; i++) {
+			int sub = this.getSubBlock(i, nextBody);
+			
+			if(sub == -1) {
+				throw new Error("Erreur lexer -> detectBlocks (subblocks part fullBlock start: "+start+
+						", end: "+end+")");
+			}
+			
+			System.out.println("search end, put in map (local getSubBlocks) add in local map ..."
+					+ " (sub="+sub+")");
+			
+			map.put(i, this.getBlockLines(i, sub));
+			
+			System.out.println("fait. check subblock body ...");
+			
+			if(this.isSubBlockBody(this.lines.get(sub))) {
+				i = sub - 1;
+				nextBody = true;
+				System.out.println("next body = true");
+			}else {
+				i = sub;
+				nextBody = false;
+				System.out.println("next body = false");
+			}
+		}
+		
+		System.out.println("fait. full subblock");
+		System.out.println(" -------- DETECTION SUBBLOCKS END -------- ");
+		
+		return map;
+	}
+	
+	private List<String> getBlockLines(int start, int end) {
+		List<String> list = new ArrayList<>();
+		
+		for(int i = start ; i <= end ; i++) {
+			list.add(this.lines.get(i));
+		}
+		
+		return list;
+	}
+	
+	private int getFullBlock(int start) {
+		System.out.println("FULL BLOCK SEARCH (start="+start+")");
+		
+		int x = 0, y = 0;
+		
+		for(int i = start ; i < this.lines.size() ; i++) {
+			String line = this.lines.get(i);
+			
+			if(line.contains("{")) {
+				x++;
+			}
+			
+			if(line.contains("}")) {
+				y++;
+			}
+			
+			System.out.println("line: "+line+", x="+x+", y="+y);
+			
+			if(x == y) {
+				return i;
+			}
+		}
+		
+		return -1;
+	}
+	
+	private int getSubBlock(int start, boolean isBody) {
+		System.out.println("-- SUBBLOCK SEARCH (start="+start+", isBody: "+isBody+")");
+		
+		int x = 0, y = 0;
+		
+		boolean check = isBody;
+		
+		for(int i = start ; i < this.lines.size() ; i++) {
+			String line = this.lines.get(i);
+			
+			System.out.println("subline -> "+line+" at line "+i);
+			
+			if(check) {
+				line = line.substring(1);
+				check = false;
+				
+				System.out.println("subline (edit - body start) -> "+line+" at line "+i);
+			}
+			
+			for(char c : line.toCharArray()) {
+				if(!(c == '{' || c == '}')) {
+					continue;
+				}
+				
+				if(c == '{') {
+					x++;
+				}
+				
+				System.out.println("subblock finder1 x: "+x+", y:"+y);
+				
+				if(x == y) {
+					return i;
+				}
+				
+				if(c == '}') {
+					y++;
+				}
+				
+				System.out.println("subblock finder2 x: "+x+", y:"+y);
+				
+				if(x == y) {
+					return i;
+				}
+			}
+		}
+		
+		return -1;
+	}
+	
+	private boolean isBlock(String text) {
+		return text.contains("{") || text.contains("}");
+	}
+	
+	private boolean isSubBlockBody(String text) {
+		return text.startsWith("} sinon") || text.startsWith("}sinon");
+	}
+	
+	private Map<Integer, String> getMultilineFormatedCode(List<String> code) {
+		Map<Integer, String> map = new HashMap<>();
+		
+		for(String line : code) {
+			String form = line.replaceAll("([\"'])(?:(?=(\\\\?))\\2.)*?\\1", "\"\"")
+					.replaceAll("\\s+", " ");
+			
+			map.put(map.size(), form);
+		}
+		
+		return map;
+	}
+	
+	public TokenBlock getTokenBlock() {
+		return this.fullBlock;
+	}
+	
+	public static void deepSearchResults(int deep, TokenBlock tb) {
+		System.out.println("level deep: "+deep);
+		
+		for(TokenBlock stb : tb.getSubBlocks()) {
+			System.out.println("block start: "+stb.getStart()+", end: "+stb.getEnd());
+			
+			for(String line : stb.getBlock()) {
+				System.out.println(line);
+			}
+			
+			deepSearchResults((deep + 1), stb);
+		}
+	}
