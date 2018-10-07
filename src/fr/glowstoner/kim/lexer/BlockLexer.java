@@ -22,6 +22,8 @@ public class BlockLexer {
 
 		for(int i = 0 ; i < this.tokenBlock.getBlock().size() ; i++) {
 			String lines = this.tokenBlock.getBlock().get(i);
+		
+			System.out.println("i="+i+", "+lines);
 			
 			if(!this.isBlockOrSubBlock(lines)) continue;
 			
@@ -43,7 +45,19 @@ public class BlockLexer {
 				break;
 			}else {
 				System.out.println("continue.");
-				i = next;
+				
+				//patch subblock missing
+				String nextsubline = this.tokenBlock.getBlock().get(next);
+				
+				System.out.println("nextsubline ? -> " + nextsubline);
+				
+				if(this.isSubBlockBody(nextsubline)) {
+					i = next - 1;
+					System.out.println("subblock patch next - 1");
+				}else {
+					i = next;
+				}
+				//end patch
 			}
 		}
 	}

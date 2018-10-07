@@ -1,29 +1,11 @@
-afficher("Bonjour !")
-
-variable test = "LOL"
-
-si test() {
-	afficher("Vrai.")
+si test() est vrai {
+	afficher("oui");
+}sinon si test() est faux {
+	afficher("non");
 	
-	si vrai est vrai {
-		afficher("Logique")
-	}
-} sinon {
-	afficher("lol")
-	
-	si zboub est zboub {
-		afficher("#debut complexification")
-		
-		si ayaa() {
-			afficher("zboub")
-		}sinon si yatenkali{
-			afficher("boub")
-		}sinon {
-			afficher("ez")
-		}
-	}sinon {
-		afficher("LOLOLOL")
-	}
+	afficher("vrm non");
+}sinon {
+	afficher("LOL");
 }
 
 fonction globale bool test() {

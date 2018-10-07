@@ -11,7 +11,7 @@ public class Lexer {
 			"afficher", "fin", "si", "est", "sinon", "sinonsi"};
 	
 	public static final String[] OPERATORS = new String[] {"=", "/", "\\*", "-", "\\+", "%", "\\^"};
-	public static final String[] SEPARATORS = new String[] {"\\{", "\\}", "\\(", "\\)"};
+	public static final String[] SEPARATORS = new String[] {"\\{", "\\}", "\\(", "\\)", ";"};
 	
 	private Map<Integer, List<Token>> tokens = new HashMap<>();
 	private Map<Integer, String> blockLines;
