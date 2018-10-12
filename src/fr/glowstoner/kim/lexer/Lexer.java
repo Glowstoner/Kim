@@ -8,7 +8,7 @@ import java.util.Map;
 public class Lexer {
 	
 	public static final String[] KEYWORDS = new String[] {"variable", "fonction", "déclaration",
-			"afficher", "fin", "si", "est", "sinon", "sinonsi"};
+			"afficher", "fin", "si", "est", "sinon", "sinonsi" , "éxecution"};
 	
 	public static final String[] OPERATORS = new String[] {"=", "/", "\\*", "-", "\\+", "%", "\\^"};
 	public static final String[] SEPARATORS = new String[] {"\\{", "\\}", "\\(", "\\)", ";"};
@@ -201,6 +201,26 @@ public class Lexer {
 			System.out.println("FIND child");
 			this.buildSubBlockUnit(tbs);
 		}
+	}
+	
+	public Map<Integer, InstructionToken> getFinalInstructions() {
+		Map<Integer, InstructionToken> map = new HashMap<>();
+		
+		for(int i = 0 ; i < this.tokens.size() ; i++) {
+			if(this.tokens.get(i).isEmpty()) {
+				continue;
+			}
+			
+			Map<Integer, Token> tmap = new HashMap<>();
+			
+			for(int j = 0 ; j < this.tokens.get(i).size() ; j++) {
+				tmap.put(j, this.tokens.get(i).get(j));
+			}
+			
+			map.put(i, new InstructionToken(this.code.get(i), tmap));
+		}
+		
+		return map;
 	}
 	
 	public Map<Integer, String[]> getLines() {

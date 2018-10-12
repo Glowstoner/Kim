@@ -1,13 +1,19 @@
-si test() est vrai {
-	afficher("oui");
-}sinon si test() est faux {
-	afficher("non");
+déclaration fr.glowstoner.test.Test;
+
+éxecution_globale() {
+	afficher("Hello World !");
 	
-	afficher("vrm non");
-}sinon {
-	afficher("LOL");
+	variable varc = "oui";
+	
+	variable b = check(varc);
+	
+	afficher(b);	
 }
 
-fonction globale bool test() {
-	retourne vrai
-}
+fonction globale boolean check(Chaine ch) {
+	si ch est "oui" {
+		retourner vrai;
+	}sinon {
+		retourner faux;
+	}
+} 

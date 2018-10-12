@@ -27,6 +27,21 @@ public class Token {
 	}
 	
 	@Override
+	public boolean equals(Object obj) {
+		if(obj instanceof Token) {
+			Token to = (Token) obj;
+			
+			if(this.token.equals(to.getToken()) && 
+					this.type.equals(to.getType())) {
+				
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	@Override
 	public String toString() {
 		return "token: "+this.token+", type: "+this.type.name();
 	}
