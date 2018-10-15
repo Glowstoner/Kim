@@ -1,19 +1,9 @@
-déclaration fr.glowstoner.test.Test;
+déclaration fr.glowstoner.test.Test
 
-éxecution_globale() {
-	afficher("Hello World !");
-	
-	variable varc = "oui";
-	
-	variable b = check(varc);
-	
-	afficher(b);	
+#éxécute ce qui est écrit !
+éxecution_globale()
+  {
+	variable str = "Hello World"
+	afficher("Hello World !" + @str)
+	afficher("salut !", @str)
 }
-
-fonction globale boolean check(Chaine ch) {
-	si ch est "oui" {
-		retourner vrai;
-	}sinon {
-		retourner faux;
-	}
-} 

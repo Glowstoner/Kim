@@ -1,7 +1,9 @@
 package fr.glowstoner.kim.lexer;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+
+import fr.glowstoner.kim.Words;
 
 public class BlockLexer {
 
@@ -11,7 +13,10 @@ public class BlockLexer {
 		this.tokenBlock = tokenBlock;
 		
 		System.out.println("verif string tokenblock");
-		System.out.println(this.tokenBlock.getBlock().toString());
+		System.out.println(this.tokenBlock.toString());
+		
+		System.out.println("TOKENBLOCK START (real) -> " + 
+				this.tokenBlock.getStart() + ", end -> " + this.tokenBlock.getEnd());
 	}
 
 	public void find() {
@@ -29,8 +34,12 @@ public class BlockLexer {
 			
 			int next = this.getSubBlock(i, this.isSubBlockBody(lines));
 			
+			System.out.println("ajout d'un block avec start="+(this.tokenBlock.getStart() + i + 1) +
+					" et end=" + (this.tokenBlock.getStart() + next - 1));
+			
 			this.tokenBlock.addSubBlock(new TokenBlock(this.tokenBlock,
-					this.getBlockLines(i + 1, next - 1), i + 1, next - 1));
+					this.getBlockLines(i + 1, next - 1), this.tokenBlock.getStart() + i + 1,
+					this.tokenBlock.getStart() + next - 1));
 			
 			if(next == -1) {
 				throw new Error("VALEUR -1 POUR NEXT FIND SUBBLOCK LEXER");
@@ -46,7 +55,6 @@ public class BlockLexer {
 			}else {
 				System.out.println("continue.");
 				
-				//patch subblock missing
 				String nextsubline = this.tokenBlock.getBlock().get(next);
 				
 				System.out.println("nextsubline ? -> " + nextsubline);
@@ -57,7 +65,6 @@ public class BlockLexer {
 				}else {
 					i = next;
 				}
-				//end patch
 			}
 		}
 	}
@@ -115,18 +122,29 @@ public class BlockLexer {
 		return -1;
 	}
 	
-	private List<String> getBlockLines(int start, int end) {
-		List<String> list = new ArrayList<>();
+	private Map<Integer, String> getBlockLines(int start, int end) {
+		Map<Integer, String> code = new HashMap<>();
+		
+		int c = 0;
 		
 		for(int i = start ; i <= end ; i++) {
-			list.add(this.tokenBlock.getBlock().get(i));
+			System.out.println("getblockline -> "+this.tokenBlock.getBlock().get(i));
+			code.put(c, this.tokenBlock.getBlock().get(i));
+			c++;
 		}
 		
-		return list;
+		return code;
 	}
 	
 	private boolean hasMoreBlocks() {
-		for(String lines : this.tokenBlock.getBlock()) {
+		System.out.println("hasMore token block block -> "+this.tokenBlock.getBlock().toString());
+		System.out.println("size tokenblock -> "+this.tokenBlock.getBlock().size());
+		
+		for(int i = 0 ; i < this.tokenBlock.getBlock().size() ; i++) {
+			String lines = this.tokenBlock.getBlock().get(i);
+			
+			System.out.println("has more blocks -> " + lines);
+			
 			if(this.isBlockOrSubBlock(lines)) {
 				return true;
 			}
@@ -144,8 +162,8 @@ public class BlockLexer {
 	}
 	
 	public boolean isSubBlockBody(String text) {
-		return text.startsWith("} sinon") || text.startsWith("}sinon") ||
-				text.startsWith("} sinon si") || text.startsWith("}sinon si");
+		return text.startsWith("} " + Words.ELSE) || text.startsWith("}" + Words.ELSE) ||
+				text.startsWith("} " + Words.ELSEIF) || text.startsWith("}" + Words.ELSEIF);
 	}
 	
 	public TokenBlock getFinalToken() {

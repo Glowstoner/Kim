@@ -1,33 +1,33 @@
 package fr.glowstoner.kim.lexer;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class TokenBlock {
+import fr.glowstoner.kim.util.search.Recursive;
+
+public class TokenBlock extends Token implements Recursive<TokenBlock>{
 	
-	private List<String> block = new ArrayList<>();
+	private Map<Integer, String> block = new HashMap<>();
 	private List<TokenBlock> subBlocks = new ArrayList<>();
 	private TokenBlock parent;
 	private int start, end;
 	
-	public TokenBlock(TokenBlock parent, List<String> block, int start, int end) {
+	public TokenBlock(TokenBlock parent, Map<Integer, String> block, int start, int end) {
+		super(TokenType.BLOCK);
+		
 		this.setBlock(block);
 		this.setEnd(end);
 		this.setStart(start);
 		this.setParent(parent);
 	}
 	
-	public TokenBlock(List<String> block, int start, int end) {
-		this.setBlock(block);
-		this.setEnd(end);
-		this.setStart(start);
+	public Map<Integer, String> getBlock() {
+		return this.block;
 	}
-
-	public List<String> getBlock() {
-		return block;
-	}
-
-	public void setBlock(List<String> block) {
+	
+	public void setBlock(Map<Integer, String> block) {
 		this.block = block;
 	}
 	
@@ -69,6 +69,16 @@ public class TokenBlock {
 		this.parent = parent;
 	}
 
+	@Override
+	public List<TokenBlock> childs() {
+		return this.subBlocks;
+	}
+
+	@Override
+	public TokenBlock parent() {
+		return this.parent;
+	}
+	
 	@Override
 	public String toString() {
 		return "{block: "+this.block.toString()+", start: "+(this.start + 1)+", end: "+(this.end + 1)

@@ -22,7 +22,7 @@ public class FileReader {
 	public void run() {
 		this.read();
 		
-		Lexer lexer = new Lexer(this.lines);
+		Lexer lexer = new Lexer(this.file.getName(), this.lines);
 		lexer.registerTokens();
 		lexer.parseBlocks();
 		lexer.showTokens();
